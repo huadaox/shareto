@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shareto APT Repository</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --primary: #38bdf8;
+      --accent: #22c55e;
+      --border: #334155;
+      --code-bg: #0b1120;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 760px;
+      margin: 40px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+    }
+    h1 .badge {
+      font-size: 0.875rem;
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    p.desc {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: var(--primary);
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #e2e8f0;
+      position: relative;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>shareto <span class="badge">APT Repository</span></h1>
+    <p class="desc">
+      Official Debian / Ubuntu APT repository for <strong>shareto</strong> — a safe and minimal large file distribution tool for Linux.
+    </p>
+
+    <h2>Quick Install (One-liner)</h2>
+    <pre><code>curl -fsSL https://huadaox.github.io/shareto/install.sh | sudo bash</code></pre>
+
+    <h2>Manual APT Setup</h2>
+    <p class="desc">1. Import GPG public key:</p>
+    <pre><code>sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://huadaox.github.io/shareto/key.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/shareto.gpg
+sudo chmod a+r /etc/apt/keyrings/shareto.gpg</code></pre>
+
+    <p class="desc">2. Add the repository to your APT sources:</p>
+    <pre><code>echo "deb [signed-by=/etc/apt/keyrings/shareto.gpg] https://huadaox.github.io/shareto stable main" | sudo tee /etc/apt/sources.list.d/shareto.list &gt; /dev/null</code></pre>
+
+    <p class="desc">3. Update and install shareto:</p>
+    <pre><code>sudo apt update &amp;&amp; sudo apt install -y shareto</code></pre>
+
+    <div class="footer">
+      <span>Architectures: <code>amd64</code>, <code>arm64</code></span>
+      <span><a href="https://github.com/huadaox/shareto" target="_blank" rel="noopener">GitHub Project</a></span>
+    </div>
+  </div>
+</body>
+</html>

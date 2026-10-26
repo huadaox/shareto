@@ -1,0 +1,6 @@
+Archive: stable
+Component: main
+Origin: shareto
+Label: shareto
+Architecture: arm64
+Description: Official APT repository for shareto (Safe and minimal large file distribution tool for Linux)

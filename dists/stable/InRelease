@@ -1,0 +1,48 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: shareto
+Label: shareto
+Suite: stable
+Codename: stable
+Date: Mon, 26 Oct 2026 07:24:28 UTC
+Architectures: amd64 arm64
+Components: main
+Description: Official APT repository for shareto (Safe and minimal large file distribution tool for Linux)
+MD5Sum:
+ becfc66d3fdefe79275fd6178d99f09b 536 main/binary-amd64/Packages
+ bd4cb8682e39a7128ad3c5f375f77e99 397 main/binary-amd64/Packages.gz
+ ff97352006da13f1cf381ba6a8537569 190 main/binary-amd64/Release
+ a056e75846155800efb16e0c5874b52f 536 main/binary-arm64/Packages
+ 6d5c927cb06fcc941a95d245e26a9e58 394 main/binary-arm64/Packages.gz
+ 3f3cb10e814cb5a3fdca0e9b83f083a5 190 main/binary-arm64/Release
+SHA1:
+ d608e285a823652f9f153185e669386a15953457 536 main/binary-amd64/Packages
+ 21a6ed7127c3999650d6f4884f981060935d0bb4 397 main/binary-amd64/Packages.gz
+ e7bc783bdca12e9e4cb64e0cd554a1803f534759 190 main/binary-amd64/Release
+ 6e2a469fced3e983b789067d97a474494812b17f 536 main/binary-arm64/Packages
+ 9db8d9c9d5bdd255eda15ff6c1e6e9626f29c34e 394 main/binary-arm64/Packages.gz
+ 1d499d165657b82d8faf872ea5541d343b9b20e1 190 main/binary-arm64/Release
+SHA256:
+ 6d1e536e5370ddccfa3c8a0d5e906158739b9e20e5af1295730b0747ede5527b 536 main/binary-amd64/Packages
+ 3e4763bd8f993e53280345c44aaefd04da63ad133dda0b5e09867e310df1f754 397 main/binary-amd64/Packages.gz
+ e7550a85540e259142b07b12e0c454b8002ac50d46e139be2d2f724352b9e7ae 190 main/binary-amd64/Release
+ 9c9c1d87bc2a14bb934bed0fe54d243cc120cea6f94ab7923b076583af46be93 536 main/binary-arm64/Packages
+ 11508e5b2008ccb2d9111a07e1b0ea02dc6947f80db91b82503426cf99046946 394 main/binary-arm64/Packages.gz
+ b636cd34619696669862287c7aeaa9112f8ee60261961b12a27141d786a09b40 190 main/binary-arm64/Release
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvCw3auCziruv4OrpxwmUbaSf88QFAmrfACwACgkQxwmUbaSf
+88Qxbg/9HyZi4OMQkSnQajVv2QMZ+p0ErrfaUOSFAj8ma6uB0x7zgrHI8F95vuKq
+h9zdMLOSHMPj/Z7T/kytEzj1zMnlmoFTc2eRsIUnjKdgJAxh5oo4NKw3YZuhcoDn
+YcSyKb1mwRN8y5+j7LM6MkvNLRK5PERzkUuh/pDWEf5LNF/z4lv3UNbORrQaB3AE
+A0ikzRdZc2FKaeHaMLxEObgqAcBzgJNubGjPtm8wvL883sHwGHSggzqmNtc9q2lw
+Vt7ZJITt+XmH/b7DOORfWiic442ilRWl7FzysvOlaRh0JGmngL3kmGvlqmrTGcK0
+LCDvmf5CYabQ7BpXjHg29tC9dntDgHt+mMSWNWYlF6lUbQgwY9KDK3sjf10QM5BG
+S9W+oG5qhgd85IV7Lo8fQCeL0YqF0vIX1cFVFGj2+vm/4ohXMygYc7RAdmi/UhuF
+6BlkiTWpvaiqN2S+gPQtrvnivgI2b6Q4z5OHBjkxd121ERsI4XLfVbmD6tQ3xpqj
+Wd68KdoK47PuCHRrxROmI4BtlWFGU1GFpbpIvDDqD2SIByo5cZNIzEnzH7NJm7Ul
+7+x3ZybbZS27Bn+t1TGXkxordv27/dpDyII43+8HE+7cghoKgkaRqbKjRlhSQadb
+5HztJeI1IUUj5S7x55dqvCoxfAcu1KEAhkWMk7jIyxAJt2KRh9E=
+=GaFz
+-----END PGP SIGNATURE-----

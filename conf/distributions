@@ -1,0 +1,8 @@
+Origin: shareto
+Label: shareto
+Codename: stable
+Suite: stable
+Architectures: amd64 arm64
+Components: main
+Description: Official APT repository for shareto (Safe and minimal large file distribution tool for Linux)
+SignWith: 1140218FF931D43C
