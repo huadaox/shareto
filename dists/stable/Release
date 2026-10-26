@@ -2,28 +2,28 @@ Origin: shareto
 Label: shareto
 Suite: stable
 Codename: stable
-Date: Mon, 26 Oct 2026 07:47:26 UTC
+Date: Mon, 26 Oct 2026 08:48:26 UTC
 Architectures: amd64 arm64
 Components: main
 Description: Official APT repository for shareto (Safe and minimal large file distribution tool for Linux)
 MD5Sum:
- 313713c9304daab21ca71395863bca77 536 main/binary-amd64/Packages
- 06707a7bdb21cb221c2cb6fbe073baae 397 main/binary-amd64/Packages.gz
+ e6bc336cdb70cf48a57dc0bcd0a379b4 536 main/binary-amd64/Packages
+ 895498edfe82caa92a1e51a4a1ffd68a 395 main/binary-amd64/Packages.gz
  ff97352006da13f1cf381ba6a8537569 190 main/binary-amd64/Release
- e8dd9751d3c631fe98b90583028ddb61 536 main/binary-arm64/Packages
- aa1044cae279873b2856973876159368 395 main/binary-arm64/Packages.gz
+ 61baaa16ae8a3f793dd7bf7c73778328 536 main/binary-arm64/Packages
+ b4a28c7fca013167c6511e189d9908ad 397 main/binary-arm64/Packages.gz
  3f3cb10e814cb5a3fdca0e9b83f083a5 190 main/binary-arm64/Release
 SHA1:
- 31c0452d5b35d1dbfc3acf1355ba9db9a32ba163 536 main/binary-amd64/Packages
- c22102b21d33376e66974b485b49c32aee37f67e 397 main/binary-amd64/Packages.gz
+ 397a7f0a461f604663ddcb4d1f22c0c42df1b77f 536 main/binary-amd64/Packages
+ 0449a624157d353747ad330458b347d9f937fd6d 395 main/binary-amd64/Packages.gz
  e7bc783bdca12e9e4cb64e0cd554a1803f534759 190 main/binary-amd64/Release
- aebfb0416cb4647b779229c8e4d650e3398f0d1a 536 main/binary-arm64/Packages
- c4a6dbb5ce7134ef94cd57c5f627110cfe962e87 395 main/binary-arm64/Packages.gz
+ e4318d63da65411618510bbf63e45be8e03e4825 536 main/binary-arm64/Packages
+ fa30d8350d9d55e5fcf93611f95fea02c8d4b3d5 397 main/binary-arm64/Packages.gz
  1d499d165657b82d8faf872ea5541d343b9b20e1 190 main/binary-arm64/Release
 SHA256:
- 0571a3e90120a8fddc3b835ea58ad98c82d5e5e044cbb4892af3bad4ded39b2e 536 main/binary-amd64/Packages
- 51e1ad5f1ee3906ccce9c9b7ea402c9361e40fb091e983e1eb16ee60fcca2c59 397 main/binary-amd64/Packages.gz
+ 440d90a93e45d2b68cbd5f8bf60b501d2d29fd16c0370ee3e2cbae9f946097c5 536 main/binary-amd64/Packages
+ 699c7655958b641e2fe290bc7e0c36ec550136e0e3c717a6010666c9602202ec 395 main/binary-amd64/Packages.gz
  e7550a85540e259142b07b12e0c454b8002ac50d46e139be2d2f724352b9e7ae 190 main/binary-amd64/Release
- f3c850ce5f4f2b4e6bac9bdbe51f10626a5fce95689ee1efb8bb60ab8d5dde55 536 main/binary-arm64/Packages
- 669dae03a92555aff79ab674ad81a5ea9999355ac6178f67d2616f54757e1cab 395 main/binary-arm64/Packages.gz
+ 6d6ee211bbce196e110c98c463a5af1bc7e848aa9de5d9db877e9fc1ff8176a3 536 main/binary-arm64/Packages
+ e16cb5a2d17b3c51459e8be011edcd5bac339fde6889a3d4185b2a02541541bd 397 main/binary-arm64/Packages.gz
  b636cd34619696669862287c7aeaa9112f8ee60261961b12a27141d786a09b40 190 main/binary-arm64/Release

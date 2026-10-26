@@ -5,4 +5,4 @@ Suite: stable
 Architectures: amd64 arm64
 Components: main
 Description: Official APT repository for shareto (Safe and minimal large file distribution tool for Linux)
-SignWith: CBBB65D7DBF85A8D
+SignWith: 3C20C1BA59655AB3
