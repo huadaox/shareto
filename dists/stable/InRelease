@@ -5,44 +5,44 @@ Origin: shareto
 Label: shareto
 Suite: stable
 Codename: stable
-Date: Mon, 26 Oct 2026 07:24:28 UTC
+Date: Mon, 26 Oct 2026 07:47:26 UTC
 Architectures: amd64 arm64
 Components: main
 Description: Official APT repository for shareto (Safe and minimal large file distribution tool for Linux)
 MD5Sum:
- becfc66d3fdefe79275fd6178d99f09b 536 main/binary-amd64/Packages
- bd4cb8682e39a7128ad3c5f375f77e99 397 main/binary-amd64/Packages.gz
+ 313713c9304daab21ca71395863bca77 536 main/binary-amd64/Packages
+ 06707a7bdb21cb221c2cb6fbe073baae 397 main/binary-amd64/Packages.gz
  ff97352006da13f1cf381ba6a8537569 190 main/binary-amd64/Release
- a056e75846155800efb16e0c5874b52f 536 main/binary-arm64/Packages
- 6d5c927cb06fcc941a95d245e26a9e58 394 main/binary-arm64/Packages.gz
+ e8dd9751d3c631fe98b90583028ddb61 536 main/binary-arm64/Packages
+ aa1044cae279873b2856973876159368 395 main/binary-arm64/Packages.gz
  3f3cb10e814cb5a3fdca0e9b83f083a5 190 main/binary-arm64/Release
 SHA1:
- d608e285a823652f9f153185e669386a15953457 536 main/binary-amd64/Packages
- 21a6ed7127c3999650d6f4884f981060935d0bb4 397 main/binary-amd64/Packages.gz
+ 31c0452d5b35d1dbfc3acf1355ba9db9a32ba163 536 main/binary-amd64/Packages
+ c22102b21d33376e66974b485b49c32aee37f67e 397 main/binary-amd64/Packages.gz
  e7bc783bdca12e9e4cb64e0cd554a1803f534759 190 main/binary-amd64/Release
- 6e2a469fced3e983b789067d97a474494812b17f 536 main/binary-arm64/Packages
- 9db8d9c9d5bdd255eda15ff6c1e6e9626f29c34e 394 main/binary-arm64/Packages.gz
+ aebfb0416cb4647b779229c8e4d650e3398f0d1a 536 main/binary-arm64/Packages
+ c4a6dbb5ce7134ef94cd57c5f627110cfe962e87 395 main/binary-arm64/Packages.gz
  1d499d165657b82d8faf872ea5541d343b9b20e1 190 main/binary-arm64/Release
 SHA256:
- 6d1e536e5370ddccfa3c8a0d5e906158739b9e20e5af1295730b0747ede5527b 536 main/binary-amd64/Packages
- 3e4763bd8f993e53280345c44aaefd04da63ad133dda0b5e09867e310df1f754 397 main/binary-amd64/Packages.gz
+ 0571a3e90120a8fddc3b835ea58ad98c82d5e5e044cbb4892af3bad4ded39b2e 536 main/binary-amd64/Packages
+ 51e1ad5f1ee3906ccce9c9b7ea402c9361e40fb091e983e1eb16ee60fcca2c59 397 main/binary-amd64/Packages.gz
  e7550a85540e259142b07b12e0c454b8002ac50d46e139be2d2f724352b9e7ae 190 main/binary-amd64/Release
- 9c9c1d87bc2a14bb934bed0fe54d243cc120cea6f94ab7923b076583af46be93 536 main/binary-arm64/Packages
- 11508e5b2008ccb2d9111a07e1b0ea02dc6947f80db91b82503426cf99046946 394 main/binary-arm64/Packages.gz
+ f3c850ce5f4f2b4e6bac9bdbe51f10626a5fce95689ee1efb8bb60ab8d5dde55 536 main/binary-arm64/Packages
+ 669dae03a92555aff79ab674ad81a5ea9999355ac6178f67d2616f54757e1cab 395 main/binary-arm64/Packages.gz
  b636cd34619696669862287c7aeaa9112f8ee60261961b12a27141d786a09b40 190 main/binary-arm64/Release
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEvCw3auCziruv4OrpxwmUbaSf88QFAmrfACwACgkQxwmUbaSf
-88Qxbg/9HyZi4OMQkSnQajVv2QMZ+p0ErrfaUOSFAj8ma6uB0x7zgrHI8F95vuKq
-h9zdMLOSHMPj/Z7T/kytEzj1zMnlmoFTc2eRsIUnjKdgJAxh5oo4NKw3YZuhcoDn
-YcSyKb1mwRN8y5+j7LM6MkvNLRK5PERzkUuh/pDWEf5LNF/z4lv3UNbORrQaB3AE
-A0ikzRdZc2FKaeHaMLxEObgqAcBzgJNubGjPtm8wvL883sHwGHSggzqmNtc9q2lw
-Vt7ZJITt+XmH/b7DOORfWiic442ilRWl7FzysvOlaRh0JGmngL3kmGvlqmrTGcK0
-LCDvmf5CYabQ7BpXjHg29tC9dntDgHt+mMSWNWYlF6lUbQgwY9KDK3sjf10QM5BG
-S9W+oG5qhgd85IV7Lo8fQCeL0YqF0vIX1cFVFGj2+vm/4ohXMygYc7RAdmi/UhuF
-6BlkiTWpvaiqN2S+gPQtrvnivgI2b6Q4z5OHBjkxd121ERsI4XLfVbmD6tQ3xpqj
-Wd68KdoK47PuCHRrxROmI4BtlWFGU1GFpbpIvDDqD2SIByo5cZNIzEnzH7NJm7Ul
-7+x3ZybbZS27Bn+t1TGXkxordv27/dpDyII43+8HE+7cghoKgkaRqbKjRlhSQadb
-5HztJeI1IUUj5S7x55dqvCoxfAcu1KEAhkWMk7jIyxAJt2KRh9E=
-=GaFz
+iQIzBAEBCgAdFiEEc3OzLJW4pEAUqRClRL6Fs/Uv498FAmrfBY4ACgkQRL6Fs/Uv
+49+CWw/+O1DBI3Ie0ZBAsNjOaQ13+ceLexAJ3rgFhsRmhZGIaXWQRq6Hpb2Qp39o
+IHv5qRDQa2Ym0xzdpeXyqrwU3lIBAE/OjLi1uhGDnmpzpI9q2U9sWhq1jn+nMGob
+d55nATKzaTKtFhzFeMAAZwsdvG9VYWLczPOK+JGfIylgQwDig5ko5R1R5dc3TcSx
+A+ODZ+cShzaCiZxoqkO0hnz7i6E+NhCXLHxW7y4ePv5NlCQVUrnE4wwKtvUNEQ6C
+8kICh4jo93iD3LYZ6xn6Yiunuh/MI1VJhfzdZENsMYQ7YyT0OjMYIHSPxxYkBSlK
+pNVtWJog1C1GKIXLCJQ5HTn1GW4v3nHH1D9FnGSAgIP+t524yZlYMmOGE5A2keVe
+E9PF4NcrCLmmpkfmBfzHfM2bA651r48sGSMj6ggYvokBIQMY5dlPFsfKYNIRHcTI
+VUfwUD1oFGjhbhy6ZEcgrhS8b1GuXI0+QEAleaN4fTBEIHvgvmZ2by9FqzH1It31
+HUCYt7qmJH5gPQmkbjz3RLdz40QgjuV09NhUI8zsSFEh6hv+MzI45wc87cpEpodC
+Z1RStS5WCeF0hldrEvAhuQaL1h5yxNe2iT298LolaaTPZwMVpZfJDiLyRphV8n0f
+HRWOnKL6okERzxRvppQZhXVsUUUiOPKsQSBY7Jbloyop6f7jYGI=
+=BJx3
 -----END PGP SIGNATURE-----
