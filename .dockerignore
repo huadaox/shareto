@@ -1,0 +1,11 @@
+*
+!go.mod
+!go.sum
+!cmd/
+!cmd/**
+!internal/
+!internal/**
+!packaging/
+!packaging/docker/
+!packaging/docker/config.example.json
+!LICENSE

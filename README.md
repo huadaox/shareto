@@ -74,6 +74,23 @@ sequenceDiagram
 
 ## 🚀 快速上手 (Quick Start)
 
+### Docker 部署
+
+需要 Docker 和 Docker Compose 插件（v2 或更新版本）。在源码目录准备配置和待分享目录，然后启动：
+
+```bash
+cp packaging/docker/config.example.json config.docker.json
+mkdir -p shared
+docker compose up -d --build --wait
+docker compose exec shareto shareto /files/report.pdf
+```
+
+将待分享文件放入 `shared`，例如 `shared/report.pdf`。
+默认通过当前电脑的 `http://127.0.0.1:38080` 访问。
+向其他电脑分享时，需要设置宿主机发布地址，并在配置中填写接收者能够访问的网址。
+支持 amd64 和 arm64，分享记录保存在 Docker 数据卷中。
+完整安装、端口配置、更新和撤销分享命令见 [Docker 使用说明](docs/DOCKER.md)。
+
 ### MacBook 安装
 
 下载 `shareto_<version>_darwin_universal.pkg`，使用 macOS 安装器打开。安装包同时支持 Apple Silicon 和 Intel，要求 macOS 13 或以后版本。

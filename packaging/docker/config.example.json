@@ -1,0 +1,10 @@
+{
+  "listen_addr": "0.0.0.0:38080",
+  "public_base_url": "http://127.0.0.1:38080",
+  "tls": {
+    "enabled": false,
+    "cert_file": "",
+    "key_file": ""
+  },
+  "trusted_proxies": []
+}

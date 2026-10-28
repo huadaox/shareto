@@ -1,0 +1,35 @@
+services:
+  shareto:
+    image: ${SHARETO_IMAGE:-shareto:local}
+    build:
+      context: .
+      args:
+        VERSION: ${SHARETO_VERSION:-3.0.0}
+    restart: unless-stopped
+    ports:
+      - "${SHARETO_BIND_ADDRESS:-127.0.0.1}:${SHARETO_PORT:-38080}:38080"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 20s
+    tmpfs:
+      - /run:uid=65532,gid=65532,mode=0700
+    volumes:
+      - type: bind
+        source: ${SHARETO_CONFIG_FILE:-./config.docker.json}
+        target: /config/shareto/config.json
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${SHARETO_FILES_DIR:-./shared}
+        target: /files
+        read_only: true
+        bind:
+          create_host_path: false
+      - shareto-state:/data
+
+volumes:
+  shareto-state:

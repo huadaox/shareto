@@ -21,3 +21,6 @@ work/
 # Local state & config
 config.json
 state.json
+config.docker.json
+.env
+shared/
