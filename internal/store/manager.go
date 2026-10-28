@@ -184,6 +184,7 @@ func (m *Manager) snapshotState() *PersistentState {
 			MtimeUnixNano:      entry.MtimeUnixNano,
 			CtimeUnixNano:      entry.CtimeUnixNano,
 			PasswordHash:       entry.PasswordHash,
+			BaseURL:            entry.BaseURL,
 			CreatedAt:          entry.CreatedAt,
 			ExpiresAt:          entry.ExpiresAt,
 			MaxDownloads:       entry.MaxDownloads,
@@ -247,7 +248,7 @@ func (m *Manager) saveStateLocked() error {
 }
 
 // CreateShare registers and pins a new file share.
-func (m *Manager) CreateShare(filePath string, expiresDuration time.Duration, maxDownloads int, passwordHash string) (*ShareEntry, error) {
+func (m *Manager) CreateShare(filePath string, expiresDuration time.Duration, maxDownloads int, passwordHash string, baseURL ...string) (*ShareEntry, error) {
 	m.saveMu.Lock()
 	defer m.saveMu.Unlock()
 	if maxDownloads < 1 || maxDownloads > 1000 {
@@ -268,6 +269,11 @@ func (m *Manager) CreateShare(filePath string, expiresDuration time.Duration, ma
 		return nil, err
 	}
 
+	var shareBaseURL string
+	if len(baseURL) > 0 && baseURL[0] != "" {
+		shareBaseURL = baseURL[0]
+	}
+
 	now := time.Now()
 	entry := &ShareEntry{
 		Token:              token,
@@ -279,6 +285,7 @@ func (m *Manager) CreateShare(filePath string, expiresDuration time.Duration, ma
 		MtimeUnixNano:      fi.ModTime().UnixNano(),
 		CtimeUnixNano:      fileChangeTime(fi),
 		PasswordHash:       passwordHash,
+		BaseURL:            shareBaseURL,
 		CreatedAt:          now,
 		ExpiresAt:          now.Add(expiresDuration),
 		MaxDownloads:       maxDownloads,
@@ -342,8 +349,17 @@ func (m *Manager) RemoveShare(token string) error {
 	return nil
 }
 
-// RevokeShare revokes shares matching full token, token prefix (>= 6 chars), or real file path.
+// RevokeShare revokes shares matching full token, token prefix (>= 6 chars), URL, or real file path.
 func (m *Manager) RevokeShare(target string) ([]string, error) {
+	target = strings.TrimSpace(target)
+	cleanedTarget := strings.TrimRight(target, ".")
+	if idx := strings.Index(cleanedTarget, "/s/"); idx != -1 {
+		cleanedTarget = strings.Trim(cleanedTarget[idx+3:], "/")
+		if qIdx := strings.Index(cleanedTarget, "?"); qIdx != -1 {
+			cleanedTarget = cleanedTarget[:qIdx]
+		}
+	}
+
 	m.saveMu.Lock()
 	defer m.saveMu.Unlock()
 	m.mu.Lock()
@@ -352,11 +368,13 @@ func (m *Manager) RevokeShare(target string) ([]string, error) {
 
 	for token, entry := range m.shares {
 		match := false
-		if token == target {
+		if token == target || token == cleanedTarget {
 			match = true
-		} else if len(target) >= 6 && strings.HasPrefix(token, target) {
+		} else if len(cleanedTarget) >= 6 && strings.HasPrefix(token, cleanedTarget) {
 			match = true
-		} else if entry.FilePath == target || entry.FileName == target {
+		} else if entry.FilePath == target || entry.FilePath == cleanedTarget ||
+			filepath.Clean(entry.FilePath) == filepath.Clean(target) ||
+			entry.FileName == target || entry.FileName == cleanedTarget {
 			match = true
 		}
 

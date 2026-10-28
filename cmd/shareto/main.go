@@ -43,9 +43,11 @@ func main() {
 	case "daemon":
 		runDaemon()
 	case "list":
-		runList()
+		runList(os.Args[2:])
+	case "info", "show":
+		runInfo(os.Args[2:])
 	case "revoke":
-		runRevoke()
+		runRevoke(os.Args[2:])
 	case "status":
 		runStatus()
 	case "service":
@@ -61,13 +63,14 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Printf(`shareto v%s - Safe and minimal large file distribution tool for Linux and macOS
+	fmt.Printf(`shareto v%s - Safe and minimal large file distribution tool for Linux, macOS and Windows
 
 Usage:
   shareto [flags] <file_path>  Share a file (default command)
   shareto init                 Run interactive setup wizard
-  shareto list                 List all active shares
-  shareto revoke <token|file>  Revoke an active share by token or file path
+  shareto list [flags]         List all active shares (-v, --full for details)
+  shareto info <token|file>    Show full details and URLs for a share
+  shareto revoke [flags] <id>  Revoke an active share by token or file path
   shareto status               Check daemon status
   shareto service <action>     Install, start, stop, restart or uninstall the user service
   shareto daemon               Start the daemon in the foreground
@@ -78,6 +81,12 @@ Share Flags:
   -p                 Prompt for password protection
   --password-stdin   Read password from standard input
   --base-url string  Override public base URL (e.g. http://your-domain.com:38080)
+
+List Flags:
+  -v, --full         Show full file paths, URLs and detailed properties
+
+Revoke Flags:
+  -y, --yes, --all   Confirm revoking all matching shares without prompting
 `, Version)
 }
 
@@ -251,7 +260,14 @@ func runShare(args []string) {
 	}
 }
 
-func runList() {
+func runList(args []string) {
+	verbose := false
+	for _, arg := range args {
+		if arg == "-v" || arg == "--verbose" || arg == "--full" || arg == "-l" {
+			verbose = true
+		}
+	}
+
 	client := ipc.NewClient()
 	if !client.Ping() {
 		fmt.Fprintln(os.Stderr, "Error: shareto daemon is not running.")
@@ -272,37 +288,159 @@ func runList() {
 		return
 	}
 
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "TOKEN\tFILE\tSIZE\tREMAINING\tSTREAMS\tAUTH\tEXPIRES")
-	for _, s := range shares {
-		tokenDisplay := s.Token
-		if len(tokenDisplay) > 10 {
-			tokenDisplay = tokenDisplay[:8] + ".."
+	if verbose {
+		for i, s := range shares {
+			authDisplay := "None"
+			if s.HasPassword {
+				authDisplay = "Password protected"
+			}
+			rawDisplay := s.RawURL
+			if rawDisplay == "" {
+				rawDisplay = "N/A (Password protected)"
+			}
+			fmt.Printf("[%d] Token:       %s\n", i+1, s.Token)
+			fmt.Printf("    File Name:   %s\n", s.FileName)
+			fmt.Printf("    File Path:   %s\n", s.FilePath)
+			fmt.Printf("    Size:        %s (%d bytes)\n", httpd.FormatBytes(s.FileSize), s.FileSize)
+			fmt.Printf("    Public URL:  %s\n", s.URL)
+			fmt.Printf("    Direct URL:  %s\n", rawDisplay)
+			fmt.Printf("    Remaining:   %d/%d downloads\n", s.RemainingDownloads, s.MaxDownloads)
+			fmt.Printf("    Streams:     %d active\n", s.ActiveStreams)
+			fmt.Printf("    Security:    %s\n", authDisplay)
+			fmt.Printf("    Expires:     %s\n\n", s.ExpiresAt)
 		}
+		return
+	}
+
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+	fmt.Fprintln(w, "TOKEN\tFILE\tSIZE\tREMAINING\tAUTH\tEXPIRES\tURL")
+	for _, s := range shares {
 		authDisplay := "None"
 		if s.HasPassword {
 			authDisplay = "Password"
 		}
 		remainingDisplay := fmt.Sprintf("%d/%d", s.RemainingDownloads, s.MaxDownloads)
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%d\t%s\t%s\n",
-			tokenDisplay,
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			s.Token,
 			s.FileName,
 			httpd.FormatBytes(s.FileSize),
 			remainingDisplay,
-			s.ActiveStreams,
 			authDisplay,
 			s.ExpiresAt,
+			s.URL,
 		)
 	}
 	_ = w.Flush()
 }
 
-func runRevoke() {
-	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "Usage: shareto revoke <token|token_prefix|file_path>")
+func runInfo(args []string) {
+	if len(args) < 1 {
+		fmt.Fprintln(os.Stderr, "Usage: shareto info <token|file_path>")
 		os.Exit(1)
 	}
-	target := os.Args[2]
+	target := args[0]
+	client := ipc.NewClient()
+	if !client.Ping() {
+		fmt.Fprintln(os.Stderr, "Error: shareto daemon is not running.")
+		os.Exit(1)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	shares, err := client.List(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to query shares: %v\n", err)
+		os.Exit(1)
+	}
+
+	matches := matchShares(shares, target)
+	if len(matches) == 0 {
+		fmt.Fprintf(os.Stderr, "Error: no matching shares found for '%s'.\n", target)
+		os.Exit(1)
+	}
+
+	for i, s := range matches {
+		authDisplay := "None"
+		if s.HasPassword {
+			authDisplay = "Password protected"
+		}
+		rawDisplay := s.RawURL
+		if rawDisplay == "" {
+			rawDisplay = "N/A (Password protected)"
+		}
+		if len(matches) > 1 {
+			fmt.Printf("[%d] Token:       %s\n", i+1, s.Token)
+		} else {
+			fmt.Printf("Token:       %s\n", s.Token)
+		}
+		fmt.Printf("File Name:   %s\n", s.FileName)
+		fmt.Printf("File Path:   %s\n", s.FilePath)
+		fmt.Printf("Size:        %s (%d bytes)\n", httpd.FormatBytes(s.FileSize), s.FileSize)
+		fmt.Printf("Public URL:  %s\n", s.URL)
+		fmt.Printf("Direct URL:  %s\n", rawDisplay)
+		fmt.Printf("Remaining:   %d/%d downloads\n", s.RemainingDownloads, s.MaxDownloads)
+		fmt.Printf("Streams:     %d active\n", s.ActiveStreams)
+		fmt.Printf("Security:    %s\n", authDisplay)
+		fmt.Printf("Expires:     %s\n\n", s.ExpiresAt)
+	}
+}
+
+func matchShares(shares []ipc.ShareItemResponse, target string) []ipc.ShareItemResponse {
+	target = strings.TrimSpace(target)
+	cleanedTarget := strings.TrimRight(target, ".")
+	if idx := strings.Index(cleanedTarget, "/s/"); idx != -1 {
+		cleanedTarget = strings.Trim(cleanedTarget[idx+3:], "/")
+		if qIdx := strings.Index(cleanedTarget, "?"); qIdx != -1 {
+			cleanedTarget = cleanedTarget[:qIdx]
+		}
+	}
+
+	var absTarget string
+	if target != "" {
+		if abs, err := filepath.Abs(target); err == nil {
+			absTarget = abs
+		}
+	}
+	cleanTarget := filepath.Clean(target)
+
+	var matches []ipc.ShareItemResponse
+	for _, s := range shares {
+		match := false
+		if s.Token == target || s.Token == cleanedTarget {
+			match = true
+		} else if len(cleanedTarget) >= 6 && strings.HasPrefix(s.Token, cleanedTarget) {
+			match = true
+		} else if s.FilePath == target || s.FilePath == cleanedTarget {
+			match = true
+		} else if absTarget != "" && (s.FilePath == absTarget || filepath.Clean(s.FilePath) == absTarget) {
+			match = true
+		} else if filepath.Clean(s.FilePath) == cleanTarget {
+			match = true
+		} else if s.FileName == target || s.FileName == cleanedTarget {
+			match = true
+		}
+
+		if match {
+			matches = append(matches, s)
+		}
+	}
+	return matches
+}
+
+func runRevoke(args []string) {
+	fs := flag.NewFlagSet("revoke", flag.ExitOnError)
+	yesFlag := fs.Bool("y", false, "Confirm revoking all matches")
+	fs.BoolVar(yesFlag, "yes", false, "Confirm revoking all matches")
+	fs.BoolVar(yesFlag, "all", false, "Confirm revoking all matches")
+	_ = fs.Parse(args)
+
+	remaining := fs.Args()
+	if len(remaining) < 1 {
+		fmt.Fprintln(os.Stderr, "Usage: shareto revoke [flags] <token|token_prefix|file_path>")
+		os.Exit(1)
+	}
+	target := remaining[0]
 
 	client := ipc.NewClient()
 	if !client.Ping() {
@@ -313,18 +451,63 @@ func runRevoke() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	res, err := client.Revoke(ctx, target)
+	shares, err := client.List(ctx)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Revoke failed: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to query daemon: %v\n", err)
 		os.Exit(1)
 	}
 
-	if len(res.RevokedTokens) == 0 {
-		fmt.Printf("No matching shares found for target '%s'.\n", target)
+	matches := matchShares(shares, target)
+	if len(matches) == 0 {
+		fmt.Fprintf(os.Stderr, "Error: no matching shares found for target '%s'.\n", target)
+		os.Exit(1)
+	}
+
+	if len(matches) > 1 && !*yesFlag {
+		fmt.Printf("Found %d shares matching '%s':\n", len(matches), target)
+		for i, s := range matches {
+			fmt.Printf("  [%d] Token: %s\n", i+1, s.Token)
+			fmt.Printf("      File:  %s (%s)\n", s.FileName, s.FilePath)
+			fmt.Printf("      URL:   %s\n", s.URL)
+		}
+		fmt.Println()
+
+		if term.IsTerminal(int(os.Stdin.Fd())) {
+			fmt.Printf("Revoke all %d matching shares? [y/N]: ", len(matches))
+			reader := bufio.NewReader(os.Stdin)
+			line, _ := reader.ReadString('\n')
+			ans := strings.ToLower(strings.TrimSpace(line))
+			if ans != "y" && ans != "yes" {
+				fmt.Println("Revocation aborted.")
+				os.Exit(1)
+			}
+		} else {
+			fmt.Fprintf(os.Stderr, "Error: multiple shares match '%s'. Specify a unique token or pass --yes to revoke all.\n", target)
+			os.Exit(1)
+		}
+	}
+
+	revokedCount := 0
+	for _, m := range matches {
+		res, err := client.Revoke(ctx, m.Token)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to revoke %s: %v\n", m.Token, err)
+			os.Exit(1)
+		}
+		revokedCount += len(res.RevokedTokens)
+	}
+
+	if revokedCount == 0 {
+		fmt.Fprintf(os.Stderr, "Error: failed to revoke any share matching '%s'.\n", target)
+		os.Exit(1)
+	}
+
+	if revokedCount == 1 {
+		fmt.Printf("Successfully revoked share: %s (%s)\n", matches[0].Token, matches[0].FileName)
 	} else {
-		fmt.Printf("Successfully revoked %d share(s):\n", len(res.RevokedTokens))
-		for _, t := range res.RevokedTokens {
-			fmt.Printf(" - %s\n", t)
+		fmt.Printf("Successfully revoked %d shares:\n", revokedCount)
+		for _, m := range matches {
+			fmt.Printf(" - %s (%s: %s)\n", m.Token, m.FileName, m.FilePath)
 		}
 	}
 }

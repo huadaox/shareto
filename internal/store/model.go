@@ -35,6 +35,7 @@ type ShareEntry struct {
 	MtimeUnixNano      int64                       `json:"mtime_unix_nano"` // 初始修改时间(纳秒)
 	CtimeUnixNano      int64                       `json:"ctime_unix_nano"`
 	PasswordHash       string                      `json:"password_hash,omitempty"` // Argon2id 编码字符串，空表示无密码
+	BaseURL            string                      `json:"base_url,omitempty"`      // 创建时指定的 Public Base URL
 	CreatedAt          time.Time                   `json:"created_at"`
 	ExpiresAt          time.Time                   `json:"expires_at"`
 	MaxDownloads       int                         `json:"max_downloads"` // 1 ~ 1000

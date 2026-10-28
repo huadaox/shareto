@@ -186,6 +186,9 @@ type ShareItemResponse struct {
 	HasPassword        bool   `json:"has_password"`
 	CreatedAt          string `json:"created_at"`
 	ExpiresAt          string `json:"expires_at"`
+	BaseURL            string `json:"base_url,omitempty"`
+	URL                string `json:"url"`
+	RawURL             string `json:"raw_url,omitempty"`
 }
 
 type RevokeRequest struct {
@@ -211,13 +214,6 @@ func (s *Server) handleShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dur := time.Duration(req.ExpiresSec) * time.Second
-	entry, err := s.storeMgr.CreateShare(req.FilePath, dur, req.MaxDownloads, req.PasswordHash)
-	if err != nil {
-		http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusBadRequest)
-		return
-	}
-
 	base := s.cfg.PublicBaseURL
 	if req.PublicBaseURL != "" {
 		base = strings.TrimRight(req.PublicBaseURL, "/")
@@ -229,6 +225,14 @@ func (s *Server) handleShare(w http.ResponseWriter, r *http.Request) {
 			base = "http://" + base
 		}
 	}
+
+	dur := time.Duration(req.ExpiresSec) * time.Second
+	entry, err := s.storeMgr.CreateShare(req.FilePath, dur, req.MaxDownloads, req.PasswordHash, base)
+	if err != nil {
+		http.Error(w, fmt.Sprintf(`{"error":"%s"}`, err.Error()), http.StatusBadRequest)
+		return
+	}
+
 	resp := ShareResponse{
 		Token:     entry.Token,
 		URL:       fmt.Sprintf("%s/s/%s", base, entry.Token),
@@ -244,7 +248,36 @@ func (s *Server) handleList(w http.ResponseWriter, r *http.Request) {
 	shares := s.storeMgr.ListShares()
 	resp := make([]ShareItemResponse, 0, len(shares))
 
+	defaultBase := s.cfg.PublicBaseURL
+	if !strings.HasPrefix(defaultBase, "http://") && !strings.HasPrefix(defaultBase, "https://") {
+		if s.cfg.TLS.Enabled {
+			defaultBase = "https://" + defaultBase
+		} else {
+			defaultBase = "http://" + defaultBase
+		}
+	}
+	defaultBase = strings.TrimRight(defaultBase, "/")
+
 	for _, entry := range shares {
+		base := entry.BaseURL
+		if base == "" {
+			base = defaultBase
+		}
+		if !strings.HasPrefix(base, "http://") && !strings.HasPrefix(base, "https://") {
+			if s.cfg.TLS.Enabled {
+				base = "https://" + base
+			} else {
+				base = "http://" + base
+			}
+		}
+		base = strings.TrimRight(base, "/")
+
+		publicURL := fmt.Sprintf("%s/s/%s", base, entry.Token)
+		rawURL := ""
+		if entry.PasswordHash == "" {
+			rawURL = fmt.Sprintf("%s/s/%s?raw=1", base, entry.Token)
+		}
+
 		resp = append(resp, ShareItemResponse{
 			Token:              entry.Token,
 			FileName:           entry.FileName,
@@ -256,6 +289,9 @@ func (s *Server) handleList(w http.ResponseWriter, r *http.Request) {
 			HasPassword:        entry.PasswordHash != "",
 			CreatedAt:          entry.CreatedAt.Format(time.RFC3339),
 			ExpiresAt:          entry.ExpiresAt.Format(time.RFC3339),
+			BaseURL:            base,
+			URL:                publicURL,
+			RawURL:             rawURL,
 		})
 	}
 
