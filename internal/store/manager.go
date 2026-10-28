@@ -33,11 +33,11 @@ type Manager struct {
 // DefaultStatePath returns the path to state.json under $XDG_STATE_HOME.
 func DefaultStatePath() string {
 	stateDir := os.Getenv("XDG_STATE_HOME")
-	if stateDir == "" && runtime.GOOS == "darwin" {
+	if stateDir == "" && (runtime.GOOS == "darwin" || runtime.GOOS == "windows") {
 		var err error
 		stateDir, err = os.UserConfigDir()
 		if err != nil {
-			panic(err)
+			stateDir = os.Getenv("AppData")
 		}
 	}
 	if stateDir == "" {
@@ -234,15 +234,13 @@ func (m *Manager) saveStateLocked() error {
 		return fmt.Errorf("failed to close state file: %w", err)
 	}
 
+	if runtime.GOOS == "windows" {
+		_ = os.Remove(m.stateFilePath)
+	}
 	if err := os.Rename(tmp.Name(), m.stateFilePath); err != nil {
 		return fmt.Errorf("failed to commit state file: %w", err)
 	}
-	directory, err := os.Open(dir)
-	if err != nil {
-		return fmt.Errorf("failed to open state directory: %w", err)
-	}
-	defer directory.Close()
-	if err := directory.Sync(); err != nil {
+	if err := syncDir(dir); err != nil {
 		return fmt.Errorf("failed to sync state directory: %w", err)
 	}
 	return nil

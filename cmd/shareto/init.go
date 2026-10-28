@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -191,10 +190,12 @@ func runInit() {
 
 	publicBaseURL := readLineWithDefault(reader, "3. Public Base URL (URL prefix printed for shared files)", defaultPublic)
 	publicBaseURL = strings.TrimRight(publicBaseURL, "/")
-
-	// Validate URL
-	if parsed, err := url.Parse(publicBaseURL); err != nil || parsed.Scheme == "" {
-		fmt.Printf("   \033[33m⚠ Warning: '%s' does not appear to be a valid URL (missing http:// or https://)\033[0m\n", publicBaseURL)
+	if publicBaseURL != "" && !strings.HasPrefix(publicBaseURL, "http://") && !strings.HasPrefix(publicBaseURL, "https://") {
+		if enableTLS {
+			publicBaseURL = "https://" + publicBaseURL
+		} else {
+			publicBaseURL = "http://" + publicBaseURL
+		}
 	}
 
 	fmt.Println()

@@ -58,6 +58,13 @@ func DefaultSocketPath() string {
 		}
 		return filepath.Join(cacheDir, "shareto", "ipc.sock")
 	}
+	if runtimeDir == "" && runtime.GOOS == "windows" {
+		cacheDir, err := os.UserCacheDir()
+		if err != nil {
+			cacheDir = os.Getenv("LOCALAPPDATA")
+		}
+		return filepath.Join(cacheDir, "shareto", "ipc.sock")
+	}
 	if runtimeDir == "" {
 		uid := os.Getuid()
 		runUser := fmt.Sprintf("/run/user/%d", uid)
@@ -111,14 +118,16 @@ func (s *Server) Start() error {
 		return fmt.Errorf("failed to listen on unix socket: %w", err)
 	}
 
-	if err := os.Chmod(s.sockPath, 0600); err != nil {
-		_ = rawListener.Close()
-		return fmt.Errorf("failed to set socket permissions: %w", err)
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(s.sockPath, 0600); err != nil {
+			_ = rawListener.Close()
+			return fmt.Errorf("failed to set socket permissions: %w", err)
+		}
 	}
 
 	s.listener = &peerCredListener{
 		Listener:    rawListener,
-		expectedUID: uint32(os.Getuid()),
+		expectedUID: currentUserID(),
 	}
 
 	mux := http.NewServeMux()
@@ -212,6 +221,13 @@ func (s *Server) handleShare(w http.ResponseWriter, r *http.Request) {
 	base := s.cfg.PublicBaseURL
 	if req.PublicBaseURL != "" {
 		base = strings.TrimRight(req.PublicBaseURL, "/")
+	}
+	if !strings.HasPrefix(base, "http://") && !strings.HasPrefix(base, "https://") {
+		if s.cfg.TLS.Enabled {
+			base = "https://" + base
+		} else {
+			base = "http://" + base
+		}
 	}
 	resp := ShareResponse{
 		Token:     entry.Token,

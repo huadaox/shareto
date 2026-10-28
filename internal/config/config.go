@@ -54,11 +54,11 @@ func DefaultConfig() *Config {
 // DefaultConfigPath returns the path to config.json according to XDG spec.
 func DefaultConfigPath() string {
 	configDir := os.Getenv("XDG_CONFIG_HOME")
-	if configDir == "" && runtime.GOOS == "darwin" {
+	if configDir == "" && (runtime.GOOS == "darwin" || runtime.GOOS == "windows") {
 		var err error
 		configDir, err = os.UserConfigDir()
 		if err != nil {
-			panic(err)
+			configDir = os.Getenv("AppData")
 		}
 	}
 	if configDir == "" {
@@ -129,6 +129,9 @@ func SaveConfig(path string, cfg *Config) error {
 	tmpPath := fmt.Sprintf("%s.tmp.%d", path, os.Getpid())
 	if err := os.WriteFile(tmpPath, data, 0600); err != nil {
 		return fmt.Errorf("failed to write temp config: %w", err)
+	}
+	if runtime.GOOS == "windows" {
+		_ = os.Remove(path)
 	}
 	if err := os.Rename(tmpPath, path); err != nil {
 		_ = os.Remove(tmpPath)

@@ -1,18 +1,14 @@
 package store
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"syscall"
 	"time"
-
-	"golang.org/x/sys/unix"
 )
 
-// OpenAndPinFile resolves symlinks, opens the file using O_NOFOLLOW and O_CLOEXEC,
+// OpenAndPinFile resolves symlinks, opens the file securely,
 // verifies that it is a non-empty regular file, and returns the file descriptor along with metadata.
 func OpenAndPinFile(rawPath string) (*os.File, os.FileInfo, uint64, uint64, error) {
 	absPath, err := filepath.Abs(rawPath)
@@ -25,35 +21,7 @@ func OpenAndPinFile(rawPath string) (*os.File, os.FileInfo, uint64, uint64, erro
 		return nil, nil, 0, 0, fmt.Errorf("failed to resolve symlink: %w", err)
 	}
 
-	fd, err := unix.Open(realPath, unix.O_RDONLY|unix.O_NOFOLLOW|unix.O_CLOEXEC, 0)
-	if err != nil {
-		return nil, nil, 0, 0, fmt.Errorf("failed to open file securely: %w", err)
-	}
-
-	file := os.NewFile(uintptr(fd), realPath)
-	fi, err := file.Stat()
-	if err != nil {
-		_ = file.Close()
-		return nil, nil, 0, 0, fmt.Errorf("failed to stat file: %w", err)
-	}
-
-	if !fi.Mode().IsRegular() {
-		_ = file.Close()
-		return nil, nil, 0, 0, errors.New("only regular files can be shared")
-	}
-
-	if fi.Size() <= 0 {
-		_ = file.Close()
-		return nil, nil, 0, 0, errors.New("empty files cannot be shared")
-	}
-
-	statT, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok {
-		_ = file.Close()
-		return nil, nil, 0, 0, errors.New("failed to retrieve syscall.Stat_t")
-	}
-
-	return file, fi, uint64(statT.Dev), statT.Ino, nil
+	return openAndPinPlatform(realPath)
 }
 
 // GetSectionReader verifies that the pinned file has not been altered, truncated, or replaced,
@@ -84,8 +52,7 @@ func (r *verifiedReaderAt) verify() error {
 		r.entry.mutated.Store(true)
 		return ErrFileMutated
 	}
-	statT, ok := fi.Sys().(*syscall.Stat_t)
-	if !ok || uint64(statT.Dev) != r.entry.DeviceID || statT.Ino != r.entry.Inode || fi.Size() != r.entry.FileSize || fi.ModTime().UnixNano() != r.entry.MtimeUnixNano || fileChangeTime(fi) != r.entry.CtimeUnixNano {
+	if err := verifyFileMetadata(r.file, fi, r.entry); err != nil {
 		r.entry.mutated.Store(true)
 		return ErrFileMutated
 	}

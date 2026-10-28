@@ -54,6 +54,7 @@ func NewShareHandler(cfg *config.Config, storeMgr *store.Manager, rl *netutil.Ra
 }
 
 func (h *ShareHandler) renderError(w http.ResponseWriter, status int, title, message string) {
+	log.Printf("[HTTP %d] %s: %s", status, title, message)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(status)
 	_ = RenderErrorPage(w, ErrorPageData{
@@ -65,7 +66,7 @@ func (h *ShareHandler) renderError(w http.ResponseWriter, status int, title, mes
 
 // HandleGetShare: GET /s/{token}
 func (h *ShareHandler) HandleGetShare(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("token")
+	token := strings.TrimSpace(strings.TrimSuffix(r.PathValue("token"), "/"))
 	if token == "" {
 		h.renderError(w, http.StatusNotFound, "Not Found", "Invalid share token.")
 		return
@@ -130,7 +131,7 @@ func (h *ShareHandler) HandleGetShare(w http.ResponseWriter, r *http.Request) {
 
 // HandleClaimShare: POST /s/{token}/claim
 func (h *ShareHandler) HandleClaimShare(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("token")
+	token := strings.TrimSpace(strings.TrimSuffix(r.PathValue("token"), "/"))
 	if token == "" {
 		h.renderError(w, http.StatusNotFound, "Not Found", "Invalid share token.")
 		return
@@ -227,8 +228,8 @@ func (h *ShareHandler) HandleClaimShare(w http.ResponseWriter, r *http.Request) 
 
 // HandleDownload: GET or HEAD /d/{token}/{session}/{filename}
 func (h *ShareHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
-	token := r.PathValue("token")
-	sessionID := r.PathValue("session")
+	token := strings.TrimSpace(strings.TrimSuffix(r.PathValue("token"), "/"))
+	sessionID := strings.TrimSpace(strings.TrimSuffix(r.PathValue("session"), "/"))
 	if token == "" || sessionID == "" {
 		h.renderError(w, http.StatusBadRequest, "Bad Request", "Missing token or session parameter.")
 		return

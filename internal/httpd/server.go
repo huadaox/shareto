@@ -40,6 +40,11 @@ func NewServer(cfg *config.Config, storeMgr *store.Manager) (*Server, error) {
 	handler := NewShareHandler(cfg, storeMgr, rateLimiter, trustedCIDRs)
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>shareto</title><style>body{background:#0f172a;color:#f8fafc;font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center;}h1{margin-bottom:8px;font-size:24px;}p{color:#94a3b8;font-size:14px;}</style></head><body><div><h1>shareto service is active</h1><p>Please access via your specific file share link (/s/{token}).</p></div></body></html>`))
+	})
 	mux.HandleFunc("GET /s/{token}", handler.HandleGetShare)
 	mux.HandleFunc("POST /s/{token}/claim", handler.HandleClaimShare)
 	mux.HandleFunc("GET /d/{token}/{session}/{filename}", handler.HandleDownload)

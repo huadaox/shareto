@@ -9,7 +9,6 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -60,7 +59,7 @@ func dialVerified(ctx context.Context, path string, timeout time.Duration) (net.
 	if err != nil {
 		return nil, err
 	}
-	if err := verifyPeerUID(conn, uint32(os.Getuid())); err != nil {
+	if err := verifyPeerUID(conn, currentUserID()); err != nil {
 		conn.Close()
 		return nil, err
 	}

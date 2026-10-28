@@ -9,7 +9,7 @@ else ifeq ($(ARCH),arm64)
 endif
 BINARY ?= dist/shareto
 
-.PHONY: all build test clean deb rpm tarball package package-all macos print-version
+.PHONY: all build test clean deb rpm tarball package package-all macos windows print-version
 
 all: build
 
@@ -58,6 +58,18 @@ macos:
 	$(MAKE) build OS=darwin ARCH=arm64 BINARY=dist/macos/arm64/shareto
 	$(MAKE) build OS=darwin ARCH=amd64 BINARY=dist/macos/amd64/shareto
 	VERSION=$(VERSION) bash packaging/build-macos.sh
+
+windows:
+	@mkdir -p dist/shareto-windows-amd64 dist/shareto-windows-arm64
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 GOTOOLCHAIN=local go build \
+		-trimpath \
+		-ldflags="-s -w -X main.Version=$(VERSION)" \
+		-o dist/shareto-windows-amd64/shareto.exe ./cmd/shareto
+	CGO_ENABLED=0 GOOS=windows GOARCH=arm64 GOTOOLCHAIN=local go build \
+		-trimpath \
+		-ldflags="-s -w -X main.Version=$(VERSION)" \
+		-o dist/shareto-windows-arm64/shareto.exe ./cmd/shareto
+	VERSION=$(VERSION) bash packaging/build-windows.sh
 
 clean:
 	rm -rf dist/

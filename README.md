@@ -1,10 +1,10 @@
 # shareto
 
 [![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go)](https://go.dev/)
-[![Platform](https://img.shields.io/badge/Platform-Linux-FCC624?logo=linux&logoColor=black)](https://kernel.org)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-`shareto` 面向 Linux 个人服务器和 MacBook 用户，提供带有下载次数、有效期和密码保护的文件分享功能（v3.0）。
+`shareto` 面向 Linux 个人服务器、MacBook 与 Windows PC 用户，提供带有下载次数、有效期和密码保护的文件分享功能（v3.0）。
 
 它通过内核级系统调用与契约驱动架构，提供比传统网盘、Alist 或网盘挂载工具更安全、更可控的大文件外链分发能力：支持阅后即焚（单次或多次下载额度）、子网绑定、并发限流、防爬虫误扣配额、防篡改熔断，且**全面拥抱 Go 1.22+ 原生标准库路由，零第三方重型 Web 框架**。
 
@@ -105,6 +105,17 @@ shareto /path/to/archive.zip
 
 后台服务使用当前登录用户的 launchd LaunchAgent，在用户登录期间运行。
 也提供可安装到用户目录的 `.tar.gz` 文件，具体命令、文件位置和卸载方式见 [MacBook 使用说明](docs/MACOS.md)。
+
+### Windows 安装
+
+下载 `shareto_<version>_windows_amd64.zip`（或 `arm64.zip`），解压后在 PowerShell 中以普通用户权限执行：
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\install.ps1
+```
+
+安装脚本会自动将 `shareto.exe` 安装到 `%LOCALAPPDATA%\Programs\shareto`，配置系统用户 `PATH`，并注册 Windows 任务计划程序（Task Scheduler）实现开机静默托管后台守护进程。具体配置及手动管理见 [Windows 使用说明](docs/WINDOWS.md)。
 
 ### Linux 安装
 

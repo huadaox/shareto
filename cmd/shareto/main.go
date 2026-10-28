@@ -188,7 +188,7 @@ func runShare(args []string) {
 			password = envPass
 		} else {
 			fmt.Print("Enter share password: ")
-			passBytes, err := term.ReadPassword(int(syscall.Stdin))
+			passBytes, err := term.ReadPassword(int(os.Stdin.Fd()))
 			fmt.Println()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to read password: %v\n", err)
@@ -355,6 +355,10 @@ func runStatus() {
 		fmt.Println("  User Service:   launchd LaunchAgent (active while logged in)")
 		return
 	}
+	if runtime.GOOS == "windows" {
+		fmt.Println("  User Service:   Windows Task Scheduler (active while logged in)")
+		return
+	}
 
 	currUser, err := user.Current()
 	if err == nil {
@@ -437,7 +441,7 @@ func runDaemon() {
 	}
 
 	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 
 	errCh := make(chan error, 2)
 
