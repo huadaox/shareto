@@ -428,19 +428,38 @@ func matchShares(shares []ipc.ShareItemResponse, target string) []ipc.ShareItemR
 	return matches
 }
 
-func runRevoke(args []string) {
-	fs := flag.NewFlagSet("revoke", flag.ExitOnError)
-	yesFlag := fs.Bool("y", false, "Confirm revoking all matches")
-	fs.BoolVar(yesFlag, "yes", false, "Confirm revoking all matches")
-	fs.BoolVar(yesFlag, "all", false, "Confirm revoking all matches")
-	_ = fs.Parse(args)
+// parseRevokeArgs splits revoke arguments into the confirmation flag and the
+// target. Share tokens are base64url strings and may legitimately begin with
+// "-", so unknown arguments are treated as the target instead of being parsed
+// as flags (which the standard flag package would reject).
+func parseRevokeArgs(args []string) (yes bool, target string) {
+	positional := make([]string, 0, len(args))
+	endOfFlags := false
+	for _, arg := range args {
+		if !endOfFlags {
+			switch arg {
+			case "-y", "--yes", "--all":
+				yes = true
+				continue
+			case "--":
+				endOfFlags = true
+				continue
+			}
+		}
+		positional = append(positional, arg)
+	}
+	if len(positional) > 0 {
+		target = positional[0]
+	}
+	return yes, target
+}
 
-	remaining := fs.Args()
-	if len(remaining) < 1 {
+func runRevoke(args []string) {
+	yes, target := parseRevokeArgs(args)
+	if target == "" {
 		fmt.Fprintln(os.Stderr, "Usage: shareto revoke [flags] <token|token_prefix|file_path>")
 		os.Exit(1)
 	}
-	target := remaining[0]
 
 	client := ipc.NewClient()
 	if !client.Ping() {
@@ -463,7 +482,7 @@ func runRevoke(args []string) {
 		os.Exit(1)
 	}
 
-	if len(matches) > 1 && !*yesFlag {
+	if len(matches) > 1 && !yes {
 		fmt.Printf("Found %d shares matching '%s':\n", len(matches), target)
 		for i, s := range matches {
 			fmt.Printf("  [%d] Token: %s\n", i+1, s.Token)

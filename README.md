@@ -1,12 +1,12 @@
 # shareto
 
-[![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?logo=go)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-1.23.2%2B-00ADD8?logo=go)](https://go.dev/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 `shareto` 面向 Linux 个人服务器、MacBook 与 Windows PC 用户，提供带有下载次数、有效期和密码保护的文件分享功能（v3.0）。
 
-它通过内核级系统调用与契约驱动架构，提供比传统网盘、Alist 或网盘挂载工具更安全、更可控的大文件外链分发能力：支持阅后即焚（单次或多次下载额度）、子网绑定、并发限流、防爬虫误扣配额、防篡改熔断，且**全面拥抱 Go 1.22+ 原生标准库路由，零第三方重型 Web 框架**。
+它通过内核级系统调用与契约驱动架构，提供比传统网盘、Alist 或网盘挂载工具更安全、更可控的大文件外链分发能力：支持阅后即焚（单次或多次下载额度）、子网绑定、并发限流、防爬虫误扣配额、防篡改熔断，且**全面拥抱 Go 原生标准库路由，零第三方重型 Web 框架**。
 
 ---
 
@@ -108,12 +108,15 @@ shareto /path/to/archive.zip
 
 ### Windows 安装
 
-下载 `shareto_<version>_windows_amd64.zip`（或 `arm64.zip`），解压后在 PowerShell 中以普通用户权限执行：
+下载 `shareto_<version>_windows_amd64.zip`（或 `arm64.zip`），解压后进入其中的 `shareto` 目录，在 PowerShell 中以普通用户权限执行：
 
 ```powershell
+cd shareto
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\install.ps1
 ```
+
+`install.ps1` 与 `shareto.exe` 在同一目录，需要一起保留；脚本不会修改系统目录，也不需要管理员权限。
 
 安装脚本会自动将 `shareto.exe` 安装到 `%LOCALAPPDATA%\Programs\shareto`，配置系统用户 `PATH`，并注册 Windows 任务计划程序（Task Scheduler）实现开机静默托管后台守护进程。具体配置及手动管理见 [Windows 使用说明](docs/WINDOWS.md)。
 
@@ -157,7 +160,7 @@ sudo apt update && sudo apt install -y shareto
 
 ### 3. 源码编译
 
-环境要求：Linux，Go 1.22+。
+环境要求：Linux，Go 1.23.2 或更新版本（与 `go.mod` 一致）。
 
 ```bash
 git clone https://github.com/huadaox/shareto.git
@@ -170,9 +173,15 @@ make build
 
 ### 4. 本地打包与构建 (.deb / .rpm / .tar.gz)
 
-本项目内置 `nfpm` 打包工作流，一条命令自动编译并构建覆盖全 Linux 发行版与主流架构的安装包：
+本项目内置 `nfpm` 打包工作流，一条命令自动编译并构建覆盖全 Linux 发行版与主流架构的安装包。
+本地打包前需要先准备打包工具（CI 中已自动安装）：
 
 ```bash
+# .deb / .rpm 打包工具
+go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
+# Windows 压缩包需要的 zip
+sudo apt install -y zip
+
 # 生成当前架构的 deb/rpm/tarball
 make package
 
@@ -183,15 +192,15 @@ make package-all
 本地安装说明：
 - **Debian / Ubuntu** (`.deb`)：
   ```bash
-  sudo dpkg -i dist/shareto_3.0.0_amd64.deb
+  sudo dpkg -i dist/shareto_<version>_amd64.deb
   ```
 - **RHEL / CentOS / Rocky / Fedora** (`.rpm`)：
   ```bash
-  sudo rpm -Uvh dist/shareto-3.0.0-1.x86_64.rpm
+  sudo rpm -Uvh dist/shareto-<version>-1.x86_64.rpm
   ```
 - **通用便携包** (`.tar.gz`，适用于 Arch、Alpine 及任意 Linux 发行版)：
   ```bash
-  tar -xzf dist/shareto_3.0.0_linux_amd64.tar.gz
+  tar -xzf dist/shareto_<version>_linux_amd64.tar.gz
   sudo cp shareto/shareto /usr/local/bin/
   ```
 
@@ -228,7 +237,7 @@ shareto init
 3. Public Base URL [https://share.example.com:38080]: https://share.example.com:38080
 
 [✓] Configuration successfully saved to ~/.config/shareto/config.json
-[✓] shareto.service restarted successfully!
+[✓] User service restarted successfully!
 ```
 
 ### 2. 创建文件分享 (默认命令)
@@ -271,9 +280,9 @@ shareto list
 ```
 输出示例：
 ```text
-TOKEN       FILE             SIZE       REMAINING  STREAMS  AUTH      EXPIRES
-m3l2Z4s8..  archive.iso      4.28 GB    3/10       2        None      2026-10-23T23:30:00Z
-a90Kf21x..  backup.tar.gz    512.00 MB  1/5        0        Password  2026-10-24T12:00:00Z
+TOKEN       FILE           SIZE       REMAINING  AUTH      EXPIRES                URL
+m3l2Z4s8..  archive.iso    4.28 GB    3/10       None      2026-10-23T23:30:00Z   https://share.example.com/s/m3l2Z4s8..
+a90Kf21x..  backup.tar.gz  512.00 MB  1/5        Password  2026-10-24T12:00:00Z   https://share.example.com/s/a90Kf21x..
 ```
 
 ### 4. 吊销指定分享

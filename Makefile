@@ -1,4 +1,4 @@
-VERSION ?= 3.0.0
+VERSION ?= $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' | grep . || echo 3.0.0)
 ARCH ?= $(shell go env GOARCH)
 OS ?= $(shell go env GOOS)
 RPM_ARCH ?= $(ARCH)
