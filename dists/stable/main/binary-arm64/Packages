@@ -1,5 +1,5 @@
 Package: shareto
-Version: 3.0.2
+Version: 3.0.3
 Architecture: arm64
 License: MIT
 Maintainer: shareto developers <support@shareto.local>
@@ -8,10 +8,10 @@ Depends: systemd
 Homepage: https://github.com/huadaox/shareto
 Priority: optional
 Section: utils
-Filename: pool/main/s/shareto/shareto_3.0.2_arm64.deb
-Size: 3247586
-SHA256: 9711a0d3171c5248beda245fe1690b4bfd708aa37936be90e2bfc63124724dc5
-SHA1: a54111760a57f83e35c51483199937a92d320300
-MD5sum: 6ae7425376a486bbe6fa874c897bb211
+Filename: pool/main/s/shareto/shareto_3.0.3_arm64.deb
+Size: 3256548
+SHA256: 13295bb78dd33269f8cb187e5f7e68ead76910f2d0ed10143c8e862439ff84ba
+SHA1: eb6cb78f02664fae4ac40a7fdb62cff24ce2ed57
+MD5sum: 875dc33521571513c0cca7a17e0deee5
 Description: Safe and minimal large file distribution tool for Linux
 
